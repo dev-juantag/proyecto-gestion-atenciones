@@ -91,7 +91,7 @@ export function Dashboard() {
             Reemplazar el contenedor con el icono <Heart /> por tu logo o imagen
             Ejemplo: <img src="/tu-logo.png" className="h-9 w-9 object-contain" />
           */}
-          <img src="/icono-ese-salud-pereira.png" alt="Logo ESE" className="h-10 w-auto max-w-[140px] object-contain brightness-0 invert" />
+          <img src="/icon-tech-tag.png" alt="Logo ESE" className="h-10 w-auto max-w-[140px] object-contain brightness-0 invert" />
           <div className="flex flex-col">
             {/* CAMBIAR NOMBRE DEL APLICATIVO AQUI */}
             <span className="text-sm font-bold leading-tight text-sidebar-foreground whitespace-nowrap overflow-hidden text-ellipsis">

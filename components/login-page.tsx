@@ -93,7 +93,7 @@ const handleRecoverySubmit = async (e: React.FormEvent) => {
               CAMBIAR LOGO AQUI: 
               Ejemplo: <img src="/tu-logo.png" alt="Logo" className="h-16 w-16" /> 
             */}
-            <img src="/logo-ese-salud-pereira.png" alt={`Logo ${COMPANY_NAME}`} className="h-24 w-auto max-w-full object-contain" />
+            <img src="/logo-tech-tag.png" alt={`Logo ${COMPANY_NAME}`} className="h-24 w-auto max-w-full object-contain" />
 
             <div className="text-center">
               {/*CAMBIAR NOMBRE DEL APLICATIVO AQUI */}
