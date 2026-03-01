@@ -10,6 +10,9 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587");
 const SMTP_USER = process.env.SMTP_USER || ""; 
 const SMTP_PASS = process.env.SMTP_PASS || "";
 
+// cambiar nombre de la app
+const APP_NAME = "ESE Salud Pereira";
+
 export const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
   port: SMTP_PORT,
@@ -29,13 +32,13 @@ export const sendRecoveryEmail = async (to: string, tempPassword: string, primer
 
   try {
     const info = await transporter.sendMail({
-      from: `"Sistema Gestión de Atenciones - ESE Salud Pereira" <${SMTP_USER}>`,
+      from: `"Sistema Gestión de Atenciones - ${APP_NAME}" <${SMTP_USER}>`,
       to,
-      subject: "Recuperación de Contraseña - ESE Salud Pereira",
+      subject: `Recuperación de Contraseña - ${APP_NAME}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
           <div style="background-color: #2F1160; padding: 20px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 24px;">ESE Salud Pereira</h1>
+            <h1 style="color: white; margin: 0; font-size: 24px;">${APP_NAME}</h1>
           </div>
           <div style="padding: 30px; background-color: #ffffff;">
             <p style="font-size: 16px; color: #334155;">Hola, ${primerNombre}</p>
@@ -43,7 +46,7 @@ export const sendRecoveryEmail = async (to: string, tempPassword: string, primer
               ${
                 isAdminRequest 
                   ? "Un administrador ha solicitado restablecer tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>." 
-                  : "Has solicitado recuperar tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>."
+                  : "Has solicitado restablecer tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>."
               }
             </p>
             

@@ -10,6 +10,7 @@ export function AdminProgramas() {
   const [atenciones, setAtenciones] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [programas, setProgramas] = useState<any[]>([])
+  const [currentStageStart, setCurrentStageStart] = useState<string | null>(null)
 
   const [showForm, setShowForm] = useState(false)
   const [editingPrograma, setEditingPrograma] = useState<any | null>(null)
@@ -45,14 +46,23 @@ export function AdminProgramas() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const resAt = await fetch("/api/atenciones")
+        const [resAt, resUs, resStage] = await Promise.all([
+          fetch("/api/atenciones"),
+          fetch("/api/users"),
+          fetch("/api/settings/stage")
+        ])
+
         if (resAt.ok) {
           setAtenciones(await resAt.json())
         }
 
-        const resUs = await fetch("/api/users")
         if (resUs.ok) {
           setUsers(await resUs.json())
+        }
+
+        if (resStage.ok) {
+          const data = await resStage.json()
+          setCurrentStageStart(data.currentStageStart)
         }
 
         fetchProgramas()
@@ -63,9 +73,14 @@ export function AdminProgramas() {
     fetchData()
   }, [])
 
+  const filteredAtenciones = useMemo(() => {
+    if (!currentStageStart) return atenciones;
+    return atenciones.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= new Date(currentStageStart));
+  }, [atenciones, currentStageStart]);
+
   const programaStats = useMemo(() => {
     return programas.map((p) => {
-      const atencionCount = atenciones.filter((a) => a.programaId === p.id).length
+      const atencionCount = filteredAtenciones.filter((a) => a.programaId === p.id).length
       const profCount = users.filter((u) => u.programaId === p.id && u.rol === "profesional").length
       // Calcula la meta en base a cantidad de profesionales por una meta individual.
       // Si el programa tiene su propia meta base guardada se considera, de lo contrario toma el valor global.
@@ -81,7 +96,7 @@ export function AdminProgramas() {
         meta: metaTotal
       }
     })
-  }, [atenciones, users, programas])
+  }, [filteredAtenciones, users, programas])
 
   const selected = programaStats.find((p) => p.id === selectedPrograma)
   const profesionalesDelPrograma = useMemo(() => {
