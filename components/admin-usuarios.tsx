@@ -39,9 +39,15 @@ export function AdminUsuarios() {
   }, [])
 
   async function fetchUsers() {
-    const res = await fetch("/api/users")
-    const data = await res.json()
-    setUsers(data)
+    try {
+      const res = await fetch("/api/users")
+      if (res.ok) {
+        const data = await res.json()
+        setUsers(data)
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   async function fetchProgramas() {

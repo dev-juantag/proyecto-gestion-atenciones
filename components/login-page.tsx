@@ -27,7 +27,12 @@ export function LoginPage() {
       body: JSON.stringify({ email, password }),
     })
 
-    const data = await res.json()
+    let data;
+    try {
+      data = await res.json()
+    } catch (e) {
+      data = { error: "Error desconocido del servidor." }
+    }
 
     if (!res.ok) {
       setError(data.error || "Error al iniciar sesión")
@@ -55,12 +60,18 @@ const handleRecoverySubmit = async (e: React.FormEvent) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     })
-    const data = await res.json()
+    
+    let data;
+    try {
+      data = await res.json()
+    } catch {
+      data = { error: "Error desconocido del servidor." }
+    }
 
     if (!res.ok) {
       setRecoveryError(data.error || "Error al intentar recuperar contraseña")
     } else {
-      setRecoverySuccess(data.message || "Te hemos enviado una contraseña temporal a tu correo.")
+      setRecoverySuccess(data.message || "Te hemos enviado una contraseña a tu correo.")
       // Podemos limpiar el form o dejar un boton para regresar
     }
   } catch (err) {
