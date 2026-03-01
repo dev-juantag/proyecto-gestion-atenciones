@@ -96,7 +96,22 @@ export function AdminPacientes() {
       calcularEdad(p.fechaNacimiento).toString()
     ])
 
-    const csvContent = "\uFEFF" + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n")
+    // Auditory Watermark Metadata
+    const watermark = [
+      ["=== DOCUMENTO DE USO EXCLUSIVO Y CONFIDENCIAL ==="],
+      ["Este documento contiene información sensible protegida por la ley."],
+      [`Generado por: ${user?.nombre} ${user?.apellidos}`],
+      [`Rol: ${user?.rol}`],
+      [`Fecha y Hora de descarga: ${new Date().toLocaleString('es-CO')}`],
+      ["--------------------------------------------------"],
+      []
+    ]
+
+    const csvContent = "\uFEFF" + 
+      watermark.map(e => e.join(";")).join("\n") + "\n" +
+      headers.join(";") + "\n" + 
+      rows.map(e => e.join(";")).join("\n")
+      
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
