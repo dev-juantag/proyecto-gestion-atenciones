@@ -278,13 +278,15 @@ export function AtencionesModule() {
             <Download className="h-4 w-4" />
             Descargar Excel
           </button>
-          <button
-            onClick={() => setSubView("form")}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            Nueva atencion
-          </button>
+          {!isAdmin && (
+            <button
+              onClick={() => setSubView("form")}
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              Nueva atencion
+            </button>
+          )}
         </div>
       </div>
 
@@ -416,16 +418,6 @@ export function AtencionesModule() {
                           >
                             <Eye className="h-4 w-4" />
                           </button>
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDelete(a.id)}
-                              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-muted"
-                              title="Eliminar atención"
-                              aria-label="Eliminar atención"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          )}
                         </div>
                       </td>
                     </tr>
