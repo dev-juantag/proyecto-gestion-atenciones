@@ -313,6 +313,9 @@ export function AtencionesModule() {
                 <th className="px-4 py-3 text-left font-semibold text-foreground hidden sm:table-cell">
                   Documento
                 </th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground hidden sm:table-cell">
+                  Teléfono
+                </th>
                 <th className="px-4 py-3 text-left font-semibold text-foreground hidden md:table-cell">
                   Programa
                 </th>
@@ -330,13 +333,13 @@ export function AtencionesModule() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
+                  <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
                     Cargando atenciones...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
+                  <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
                     No se encontraron atenciones.
                   </td>
                 </tr>
@@ -347,6 +350,9 @@ export function AtencionesModule() {
                     <td className="px-4 py-3 font-medium text-foreground">{a.pacienteNombre}</td>
                     <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
                       {a.pacienteDocumento}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                      {a.pacienteTelefono}
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
