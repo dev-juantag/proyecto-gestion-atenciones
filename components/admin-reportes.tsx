@@ -89,7 +89,7 @@ export function AdminReportes() {
 
   const filteredAtenciones = useMemo(() => {
     if (verHistorico || !currentStageStart) return atenciones
-    return atenciones.filter(a => new Date(a.createdAt) >= new Date(currentStageStart))
+    return atenciones.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= new Date(currentStageStart))
   }, [atenciones, currentStageStart, verHistorico])
 
   const atencionesPerPrograma = useMemo(() => {
@@ -363,7 +363,7 @@ export function AdminReportes() {
             </div>
             
             <p className="text-foreground text-sm mb-4">
-              ¿Está seguro que desea reiniciar el programa? Esto reiniciará las estadísticas a cero para la nueva etapa y <strong>desactivará a todos los profesionales actuales</strong>. El historial antiguo de atenciones seguirá existiendo en la base de datos y podrá consultarse seleccionando "Ver todo el historial" o descargando todo el histórico en Excel.
+              ¿Está seguro que desea reiniciar el programa? Esto reiniciará las estadísticas a cero para la nueva etapa y <strong>desactivará a todos los profesionales actuales</strong>. El historial antiguo de atenciones seguirá existiendo en la base de datos y se podrán ver las estadisticas historicas en "Ver todo el historial".
             </p>
 
             <div className="flex justify-end gap-3 mt-6">
