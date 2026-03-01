@@ -195,16 +195,6 @@ export function AdminReportes() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <select 
-            className="rounded border border-border px-3 py-2 text-sm max-w-[200px]"
-            value={filterMode}
-            onChange={(e) => setFilterMode(e.target.value as "etapa" | "fechas" | "todo")}
-          >
-            <option value="etapa">Etapa Actual</option>
-            <option value="fechas">Por Período de Fechas</option>
-            <option value="todo">Todo el historial</option>
-          </select>
-
           {filterMode === "fechas" && (
             <div className="flex items-center gap-2">
               <input 
@@ -224,6 +214,16 @@ export function AdminReportes() {
               />
             </div>
           )}
+
+          <select 
+            className="rounded border border-border px-3 py-2 text-sm max-w-[200px]"
+            value={filterMode}
+            onChange={(e) => setFilterMode(e.target.value as "etapa" | "fechas" | "todo")}
+          >
+            <option value="etapa">Etapa Actual</option>
+            <option value="fechas">Por Período de Fechas</option>
+            <option value="todo">Todo el historial</option>
+          </select>
 
           <button
             onClick={() => setShowRestartModal(true)}
