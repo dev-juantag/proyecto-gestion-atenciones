@@ -33,15 +33,12 @@ export async function POST(req: Request) {
     const primerNombreLetra = unUsuario.nombre.charAt(0).toUpperCase() || ""
     const primerApellidoLetra = unUsuario.apellidos ? unUsuario.apellidos.charAt(0).toUpperCase() : ""
     const doc = unUsuario.documento
-    // No existe "telefono" en el modelo User, así que se usa un fragmento del documento para la opción 3
-    const seudoTelefono = doc.length >= 4 ? doc.slice(-4) : "1234"
 
     const opcionesClave = [
       `CC${doc}`,                                                  // 1
       `${primerNombreLetra}${doc}`,                                // 2
-      `${seudoTelefono}${primerNombreLetra}${primerApellidoLetra}`, // 3 (pseudo-teléfono)
-      `${doc}${primerNombreLetra}${primerApellidoLetra}`,          // 4
-      `${primerNombreLetra}${primerApellidoLetra}${doc}`           // 5
+      `${doc}${primerNombreLetra}${primerApellidoLetra}`,          // 3
+      `${primerNombreLetra}${primerApellidoLetra}${doc}`           // 4
     ]
 
     const randomIndex = Math.floor(Math.random() * opcionesClave.length)
