@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
-import { Plus, Search, Pencil, Trash2, X, Upload, Power } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, X, Upload, Power, Key } from "lucide-react"
 
 type Role = "superadmin" | "admin" | "profesional"
 
@@ -615,14 +615,18 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
           </div>
 
           {user ? (
-            <div className="flex justify-end mt-2">
+            <div className="flex flex-col gap-1.5 mt-2">
+              <label className="text-sm font-semibold text-foreground">
+                Gestión de credenciales
+              </label>
               <button
                 type="button"
                 onClick={handleSendRecovery}
                 disabled={sendingRecovery}
-                className="text-sm font-medium text-primary hover:underline transition-colors disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 w-full"
                 title="Envia un correo electrónico con una contraseña original autogenerada."
               >
+                <Key className="h-4 w-4" />
                 {sendingRecovery ? "Enviando correo..." : "Enviar restablecimiento de contraseña al correo"}
               </button>
             </div>
