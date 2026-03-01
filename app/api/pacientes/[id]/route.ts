@@ -1,0 +1,61 @@
+export const runtime = "nodejs"
+
+import { prisma } from "@/lib/prisma"
+import { NextResponse } from "next/server"
+
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
+  try {
+    const params = await context.params
+    const { id } = params
+    const body = await req.json()
+    const { nombreCompleto, tipoDocumento, documento, genero, telefono, direccion, fechaNacimiento } = body
+
+    const paciente = await prisma.paciente.update({
+      where: { id },
+      data: {
+        nombreCompleto,
+        tipoDocumento,
+        documento,
+        genero,
+        telefono,
+        direccion,
+        fechaNacimiento: new Date(fechaNacimiento),
+      },
+    })
+    return NextResponse.json(paciente)
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+        return NextResponse.json(
+            { error: "Ya existe otro paciente registrado con ese número de documento" },
+            { status: 400 }
+        )
+    }
+    console.error("PUT PACIENTE ERROR:", error)
+    return NextResponse.json(
+      { error: "Error al actualizar paciente", details: error?.message || String(error) },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
+  try {
+    const params = await context.params
+    const { id } = params
+    await prisma.paciente.delete({ where: { id } })
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    // Comprobar restricciones de clave foránea si el paciente tiene 'atenciones' relacionadas
+    if (error.code === 'P2003') {
+        return NextResponse.json(
+            { error: "No se puede eliminar el paciente porque tiene atenciones registradas en el sistema. Debe borrar sus atenciones primero." },
+            { status: 400 }
+        )
+    }
+    console.error("DELETE PACIENTE ERROR:", error)
+    return NextResponse.json(
+      { error: "Error al eliminar paciente", details: error?.message || String(error) },
+      { status: 500 }
+    )
+  }
+}

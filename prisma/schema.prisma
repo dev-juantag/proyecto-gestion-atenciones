@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(uuid())
+  nombre     String
+  apellidos  String
+  email      String     @unique
+  password   String
+  documento  String     @unique
+  rol        Rol
+  programaId String?
+  activo     Boolean    @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime   @default(now())
+  atenciones Atencion[]
+  programa   Programa?  @relation(fields: [programaId], references: [id])
+}
+
+model Programa {
+  id         String     @id @default(uuid())
+  nombre     String     @unique
+  // meta individual del programa. Si es null, tomará la meta global por defecto
+  meta       Int?
+  atenciones Atencion[]
+  usuarios   User[]
+}
+
+model Paciente {
+  id              String     @id @default(uuid())
+  nombreCompleto  String
+  tipoDocumento   String
+  documento       String     @unique
+  genero          String
+  telefono        String
+  direccion       String
+  fechaNacimiento DateTime
+  atenciones      Atencion[]
+}
+
+model Atencion {
+  id            String   @id @default(uuid())
+  pacienteId    String
+  profesionalId String
+  programaId    String
+  nota          String
+  createdAt     DateTime @default(now())
+  paciente      Paciente @relation(fields: [pacienteId], references: [id])
+  profesional   User     @relation(fields: [profesionalId], references: [id])
+  programa      Programa @relation(fields: [programaId], references: [id])
+}
+
+enum Rol {
+  SUPERADMIN
+  ADMIN
+  PROFESIONAL
+}
+
+model SystemSettings {
+  id                String   @id @default(uuid())
+  currentStageStart DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
