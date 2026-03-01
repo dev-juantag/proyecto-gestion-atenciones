@@ -133,7 +133,7 @@ export function DashboardHome() {
   // Top Profesionales
   const top10Profesionales = useMemo(() => {
     if (!usuarios.length) return [];
-    const profs = usuarios.filter((u) => u.rol === "profesional");
+    const profs = usuarios.filter((u) => u.rol === "profesional" && u.activo !== false);
     
     const counts = profs.map(p => {
       const atencionesProf = filteredAtenciones.filter(a => a.profesionalId === p.id);
