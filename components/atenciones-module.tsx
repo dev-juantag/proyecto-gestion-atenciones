@@ -91,6 +91,13 @@ export function AtencionesModule() {
 
   const filtered = useMemo(() => {
     return atenciones.filter((a) => {
+      let roleAllowed = true;
+      if (!isAdmin && currentStageStart) {
+        if (new Date(a.fecha + "T00:00:00") < new Date(currentStageStart)) {
+          roleAllowed = false;
+        }
+      }
+
       const matchSearch =
         !search ||
         a.pacienteNombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -118,9 +125,9 @@ export function AtencionesModule() {
         }
       }
 
-      return matchSearch && matchPrograma && matchTime
+      return matchSearch && matchPrograma && matchTime && roleAllowed
     })
-  }, [atenciones, search, filterPrograma, filterTime])
+  }, [atenciones, search, filterPrograma, filterTime, isAdmin, currentStageStart])
 
   const handleCreated = () => {
     setRefreshKey((k) => k + 1)
@@ -162,8 +169,13 @@ export function AtencionesModule() {
 
   const handleExport = () => {
     let toExport = atenciones;
+
+    if (!isSuperAdmin && currentStageStart) {
+      toExport = toExport.filter(a => new Date(a.fecha + "T00:00:00") >= new Date(currentStageStart));
+    }
+
     if (exportType === "currentStage" && currentStageStart) {
-      toExport = atenciones.filter(a => new Date(a.fecha + "T00:00:00") >= new Date(currentStageStart));
+      toExport = toExport.filter(a => new Date(a.fecha + "T00:00:00") >= new Date(currentStageStart));
     } else if (exportType === "range") {
       toExport = atenciones.filter(a => {
         const afterStart = !exportStart || a.fecha >= exportStart;
@@ -420,8 +432,8 @@ export function AtencionesModule() {
                   onChange={(e) => setExportType(e.target.value as "currentStage" | "all" | "range")}
                   className="form-input"
                 >
-                  <option value="currentStage">Etapa Actual</option>
-                  <option value="all">Todo el historial</option>
+                  <option value="currentStage">{isSuperAdmin ? "Etapa Actual" : "Descargar atenciones"}</option>
+                  {isSuperAdmin && <option value="all">Todo el historial</option>}
                   <option value="range">Rango de fechas</option>
                 </select>
               </div>
