@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 
 export function AdminPacientes() {
-  const { user } = useAuth()
+  const { user, isSuperAdmin } = useAuth()
   const [pacientes, setPacientes] = useState<Paciente[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -62,7 +62,7 @@ export function AdminPacientes() {
       "Tipo_Documento",
       "Num_Documento",
       "Genero",
-      "Telefono",
+      ...(isSuperAdmin ? ["Telefono"] : []),
       "Direccion",
       "Fecha_Nacimiento",
       "Edad"
@@ -90,7 +90,7 @@ export function AdminPacientes() {
       escapeCsv(p.tipoDocumento),
       escapeCsv(p.documento),
       escapeCsv(p.genero),
-      escapeCsv(p.telefono),
+      ...(isSuperAdmin ? [escapeCsv(p.telefono)] : []),
       escapeCsv(p.direccion),
       new Date(p.fechaNacimiento).toISOString().split('T')[0],
       calcularEdad(p.fechaNacimiento).toString()
