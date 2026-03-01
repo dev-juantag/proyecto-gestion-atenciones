@@ -9,11 +9,13 @@ const _poppins = Poppins({
   variable: '--font-poppins',
 })
 
+import { COMPANY_NAME } from '@/lib/constants'
+
 export const metadata: Metadata = {
   // CAMBIAR TÍTULO, DESCRIPCIÓN Y SEO AQUÍ:
-  title: 'APS Pereira - Sistema de Gestión',
-  description: 'Plataforma web corporativa para el control de metas y seguimiento de atenciones institucionales de la ESE Salud Pereira.',
-  keywords: ['ESE Salud Pereira', 'salud', 'gestión', 'atenciones', 'pacientes', 'Pereira', 'sistema'],
+  title: `${COMPANY_NAME} - Sistema de Gestión`,
+  description: `Plataforma web corporativa para el control de metas y seguimiento de atenciones institucionales de ${COMPANY_NAME}.`,
+  keywords: [COMPANY_NAME, 'salud', 'gestión', 'atenciones', 'pacientes', 'Pereira', 'sistema'],
   authors: [{ name: 'Juan Taguado' }],
   
   // CAMBIAR ICONO DE LA PESTAÑA DEL NAVEGADOR AQUÍ (Favicon):
@@ -24,11 +26,11 @@ export const metadata: Metadata = {
   },
   
   openGraph: {
-    title: 'ESE Salud Pereira - Sistema de Gestión',
+    title: `${COMPANY_NAME} - Sistema de Gestión`,
     description: 'Plataforma web corporativa para el control de metas y seguimiento de atenciones.',
     type: 'website',
     locale: 'es_CO',
-    siteName: 'ESE Salud Pereira',
+    siteName: COMPANY_NAME,
   }
 }
 

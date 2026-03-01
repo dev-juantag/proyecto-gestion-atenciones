@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { Heart, Loader2, Eye, EyeOff } from "lucide-react"
+import { COMPANY_NAME } from "@/lib/constants"
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -92,12 +93,12 @@ const handleRecoverySubmit = async (e: React.FormEvent) => {
               CAMBIAR LOGO AQUI: 
               Ejemplo: <img src="/tu-logo.png" alt="Logo" className="h-16 w-16" /> 
             */}
-            <img src="/logo-ese-salud-pereira.png" alt="Logo ESE Salud Pereira" className="h-24 w-auto max-w-full object-contain" />
+            <img src="/logo-ese-salud-pereira.png" alt={`Logo ${COMPANY_NAME}`} className="h-24 w-auto max-w-full object-contain" />
 
             <div className="text-center">
               {/*CAMBIAR NOMBRE DEL APLICATIVO AQUI */}
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                APS Pereira
+                {COMPANY_NAME}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 Sistema de Gestion de Atenciones

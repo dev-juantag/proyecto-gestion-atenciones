@@ -10,8 +10,10 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587");
 const SMTP_USER = process.env.SMTP_USER || ""; 
 const SMTP_PASS = process.env.SMTP_PASS || "";
 
-// cambiar nombre de la app
-const APP_NAME = "ESE Salud Pereira";
+import { COMPANY_NAME } from "./constants";
+
+// cambiar nombre de la empresa
+const APP_NAME = COMPANY_NAME;
 
 export const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
