@@ -2,6 +2,7 @@ export const runtime = "nodejs"
 
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { capitalizeWords } from "@/lib/utils"
 
 // PUT /api/programas/[id]
 export async function PUT(
@@ -12,7 +13,7 @@ export async function PUT(
     const params = await context.params
     const { id } = params
     const body = await req.json()
-    const { nombre, meta } = body
+    let { nombre, meta } = body
 
     if (!nombre) {
       return NextResponse.json(
@@ -20,6 +21,8 @@ export async function PUT(
         { status: 400 }
       )
     }
+
+    nombre = capitalizeWords(nombre)
 
     const parsedMeta = meta ? parseInt(meta, 10) : null;
 

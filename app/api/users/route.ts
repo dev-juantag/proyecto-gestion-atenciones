@@ -24,14 +24,19 @@ export async function GET() {
   }
 }
 
+import { capitalizeWords } from "@/lib/utils";
+
 // ──────────── POST ────────────
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { nombre, apellidos, documento, email, password, rol, programaId } =
+    let { nombre, apellidos, documento, email, password, rol, programaId } =
       body;
+
+    nombre = capitalizeWords(nombre);
+    apellidos = capitalizeWords(apellidos);
 
     const existingUser = await prisma.user.findFirst({
       where: {

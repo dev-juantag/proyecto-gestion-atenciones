@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 
+import { capitalizeWords } from "@/lib/utils"
+
 // ──────────── PUT (Editar usuario) ────────────
 
 export async function PUT(
@@ -27,8 +29,8 @@ export async function PUT(
 
     const dataToUpdate: any = {}
     
-    if (nombre !== undefined) dataToUpdate.nombre = nombre
-    if (apellidos !== undefined) dataToUpdate.apellidos = apellidos
+    if (nombre !== undefined) dataToUpdate.nombre = capitalizeWords(nombre)
+    if (apellidos !== undefined) dataToUpdate.apellidos = capitalizeWords(apellidos)
     if (documento !== undefined) dataToUpdate.documento = documento
     if (email !== undefined) dataToUpdate.email = email
     if (rol !== undefined) {

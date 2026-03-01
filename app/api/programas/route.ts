@@ -17,14 +17,18 @@ export async function GET() {
   }
 }
 
+import { capitalizeWords } from "@/lib/utils"
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { nombre, meta } = body
+    let { nombre, meta } = body
 
     if (!nombre) {
       return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 })
     }
+
+    nombre = capitalizeWords(nombre)
 
     const parsedMeta = meta ? parseInt(meta, 10) : null;
     

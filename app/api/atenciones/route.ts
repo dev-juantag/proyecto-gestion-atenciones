@@ -1,7 +1,9 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { capitalizeWords } from "@/lib/utils"
 
 export async function GET(request: Request) {
   try {
@@ -55,7 +57,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    const {
+    let {
       nombreCompleto,
       tipoDocumento,
       documento,
@@ -67,6 +69,14 @@ export async function POST(req: Request) {
       profesionalId,
       programaId,
     } = body
+
+    if (nombreCompleto) {
+      nombreCompleto = capitalizeWords(nombreCompleto)
+      const wordCount = nombreCompleto.split(/\s+/).length
+      if (wordCount < 2 || wordCount > 4) {
+        return NextResponse.json({ error: "El nombre del paciente debe tener entre 2 y 4 palabras" }, { status: 400 })
+      }
+    }
 
     let paciente = await prisma.paciente.findUnique({
       where: { documento }

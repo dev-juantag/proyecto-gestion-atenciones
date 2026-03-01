@@ -664,13 +664,13 @@ function AtencionForm({
     const e: Record<string, string> = {}
     if (!programaId) e.programaId = "Seleccione un programa"
     
-    // Validar nombre (2 palabras, solo letras)
+    // Validar nombre (2 a 4 palabras, solo letras)
     const nombreLimpio = nombrePaciente.trim()
     const palabras = nombreLimpio.split(/\s+/)
     if (!nombreLimpio) {
       e.nombrePaciente = "Ingrese el nombre del paciente"
-    } else if (palabras.length < 2) {
-      e.nombrePaciente = "Debe ingresar al menos nombre y apellido (min. 2 palabras)"
+    } else if (palabras.length < 2 || palabras.length > 4) {
+      e.nombrePaciente = "Debe ingresar entre 2 y 4 nombres/apellidos."
     } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreLimpio)) {
       e.nombrePaciente = "El nombre solo puede contener letras"
     }

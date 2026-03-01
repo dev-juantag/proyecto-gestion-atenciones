@@ -146,6 +146,12 @@ export function AdminPacientes() {
       return
     }
 
+    const wordCount = editForm.nombreCompleto.trim().split(/\s+/).length
+    if (wordCount < 2 || wordCount > 4) {
+      setErrorEdit("El nombre completo del paciente debe tener entre 2 y 4 palabras.")
+      return
+    }
+
     try {
       const res = await fetch(`/api/pacientes/${editingId}`, {
         method: "PUT",

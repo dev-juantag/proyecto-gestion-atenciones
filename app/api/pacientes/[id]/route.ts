@@ -2,13 +2,22 @@ export const runtime = "nodejs"
 
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { capitalizeWords } from "@/lib/utils"
 
 export async function PUT(req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
   try {
     const params = await context.params
     const { id } = params
     const body = await req.json()
-    const { nombreCompleto, tipoDocumento, documento, genero, telefono, direccion, fechaNacimiento } = body
+    let { nombreCompleto, tipoDocumento, documento, genero, telefono, direccion, fechaNacimiento } = body
+
+    if (nombreCompleto) {
+      nombreCompleto = capitalizeWords(nombreCompleto)
+      const wordCount = nombreCompleto.split(/\s+/).length
+      if (wordCount < 2 || wordCount > 4) {
+        return NextResponse.json({ error: "El nombre del paciente debe tener entre 2 y 4 palabras" }, { status: 400 })
+      }
+    }
 
     const paciente = await prisma.paciente.update({
       where: { id },
