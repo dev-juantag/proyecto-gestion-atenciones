@@ -204,7 +204,7 @@ export function AtencionesModule() {
     };
 
     const headers = [
-      "Fecha", "Hora Exacta", "Paciente Nombre", "Documento", "Tipo_Doc", "Genero", 
+      "Fecha y Hora de registro", "Paciente Nombre", "Documento", "Tipo_Doc", "Genero", 
       ...(isSuperAdmin ? ["Telefono"] : []), "Direccion", "Edad", "Fecha_Nacimiento", "Programa", 
       "Profesional", "Nota_Valoracion"
     ]
@@ -215,8 +215,7 @@ export function AtencionesModule() {
     }
 
     const rows = toExport.map(a => [
-      a.fecha,
-      escapeCsv(a.createdAtISO ? new Date(a.createdAtISO).toLocaleString('es-CO') : ""),
+      escapeCsv(a.createdAtISO ? new Date(a.createdAtISO).toLocaleString('es-CO') : a.fecha),
       escapeCsv(a.pacienteNombre),
       escapeCsv(a.pacienteDocumento),
       escapeCsv(a.pacienteTipoDoc),
@@ -233,7 +232,7 @@ export function AtencionesModule() {
     // Auditory Watermark Metadata
     const watermark = [
       ["=== DOCUMENTO DE USO EXCLUSIVO Y CONFIDENCIAL ==="],
-      ["Este documento contiene información sensible protegida por la ley."],
+      ["Este documento contiene información sensible protegida por la Ley 1581 de 2012 (datos personales)."],
       [`Generado por: ${user?.nombre} ${user?.apellidos}`],
       [`Rol: ${user?.rol}`],
       [`Fecha y Hora de descarga: ${new Date().toLocaleString('es-CO')}`],
@@ -374,54 +373,81 @@ export function AtencionesModule() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((a) => (
-                  <tr key={a.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 text-foreground whitespace-nowrap">{a.fecha}</td>
-                    <td className="px-4 py-3 font-medium text-foreground">{a.pacienteNombre}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                      {a.pacienteDocumento}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                      {a.pacienteTelefono}
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                        {programas.find(p => p.id === a.programaId)?.nombre || "Desconocido"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
-                      {a.profesionalNombre}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden xl:table-cell max-w-xs truncate">
-                      {a.notaValoracion}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <button
-                          onClick={() => {
-                            setSelectedAtencion(a)
-                            setSubView("detail")
-                          }}
-                          className="p-1.5 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-muted"
-                          title="Ver detalles"
-                          aria-label="Ver detalles"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                        {isAdmin && (
+                (() => {
+                  const limitDate = currentStageStart ? new Date(currentStageStart) : new Date(0)
+                  const currentAtenciones = isAdmin && currentStageStart 
+                    ? filtered.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= limitDate)
+                    : filtered;
+                  const historicalAtenciones = isAdmin && currentStageStart
+                    ? filtered.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) < limitDate)
+                    : [];
+
+                  const renderRow = (a: Atencion) => (
+                    <tr key={a.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3 text-foreground whitespace-nowrap">{a.fecha}</td>
+                      <td className="px-4 py-3 font-medium text-foreground">{a.pacienteNombre}</td>
+                      <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                        {a.pacienteDocumento}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                        {a.pacienteTelefono}
+                      </td>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                          {programas.find(p => p.id === a.programaId)?.nombre || "Desconocido"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
+                        {a.profesionalNombre}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground hidden xl:table-cell max-w-xs truncate">
+                        {a.notaValoracion}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
                           <button
-                            onClick={() => handleDelete(a.id)}
-                            className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-muted"
-                            title="Eliminar atención"
-                            aria-label="Eliminar atención"
+                            onClick={() => {
+                              setSelectedAtencion(a)
+                              setSubView("detail")
+                            }}
+                            className="p-1.5 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-muted"
+                            title="Ver detalles"
+                            aria-label="Ver detalles"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Eye className="h-4 w-4" />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDelete(a.id)}
+                              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-muted"
+                              title="Eliminar atención"
+                              aria-label="Eliminar atención"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+
+                  return (
+                    <>
+                      {currentAtenciones.map(renderRow)}
+                      
+                      {historicalAtenciones.length > 0 && (
+                        <>
+                          <tr>
+                            <td colSpan={8} className="px-4 py-2 bg-muted/20 border-y border-border text-xs font-semibold text-muted-foreground uppercase opacity-80 tracking-wide text-center">
+                              Atenciones anteriores / Histórico
+                            </td>
+                          </tr>
+                          {historicalAtenciones.map(renderRow)}
+                        </>
+                      )}
+                    </>
+                  )
+                })()
               )}
             </tbody>
           </table>
