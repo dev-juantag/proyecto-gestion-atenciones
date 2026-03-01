@@ -631,6 +631,20 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
               <label className="text-sm font-semibold text-foreground">
                 Gestión de credenciales
               </label>
+              {currentUser?.rol === "superadmin" && user.id === currentUser?.id && (
+                <div className="mb-2">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Escriba aquí para cambiar su contraseña..."
+                    className="h-10 w-full mb-1 rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                  />
+                  <span className="text-xs text-muted-foreground block">
+                    Deje vacío si no desea cambiar la contraseña. O utilice el botón para enviarla al correo.
+                  </span>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={handleSendRecovery}
