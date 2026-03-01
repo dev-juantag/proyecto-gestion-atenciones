@@ -211,6 +211,7 @@ export function AdminReportes() {
                 value={dateRange.end}
                 onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
                 min={dateRange.start}
+                max={new Date().toISOString().slice(0, 10)}
               />
             </div>
           )}
