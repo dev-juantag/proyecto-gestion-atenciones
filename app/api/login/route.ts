@@ -4,9 +4,13 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 export const runtime = "nodejs";
 
-const JWT_SECRET = process.env.JWT_SECRET!
-
 export async function POST(req: Request) {
+  const JWT_SECRET = process.env.JWT_SECRET;
+
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET no está definido");
+  }
+
   try {
     const { email, password } = await req.json()
 
