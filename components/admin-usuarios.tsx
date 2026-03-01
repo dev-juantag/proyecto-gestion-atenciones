@@ -507,6 +507,8 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
   const [programaId, setProgramaId] = useState(user?.programaId || "")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const isAdminSelfEdit = currentUser?.rol === "admin" && user?.id === currentUser?.id;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isSubmitting) return
@@ -547,7 +549,8 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                disabled={isAdminSelfEdit}
+                className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -557,7 +560,8 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
                 type="text"
                 value={apellidos}
                 onChange={(e) => setApellidos(e.target.value)}
-                className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                disabled={isAdminSelfEdit}
+                className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all disabled:opacity-50"
               />
             </div>
           </div>
@@ -569,7 +573,8 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
               type="text"
               value={documento}
               onChange={(e) => setDocumento(e.target.value)}
-              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+              disabled={isAdminSelfEdit}
+              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all disabled:opacity-50"
             />
           </div>
 
@@ -580,7 +585,8 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+              disabled={isAdminSelfEdit}
+              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all disabled:opacity-50"
             />
           </div>
 
@@ -606,7 +612,7 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
               className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all disabled:opacity-50"
             >
               <option value="profesional">Profesional</option>
-              {currentUser?.rol === "superadmin" && (
+              {(currentUser?.rol === "superadmin" || rol === "admin") && (
                 <option value="admin">Administrador</option>
               )}
               {/* Si se está editando a un superadmin, no permitir cambiarlo, pero mostrar su opción si ya lo es */}
