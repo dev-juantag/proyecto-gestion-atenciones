@@ -400,8 +400,21 @@ function ImportUsersModal({ programas, onClose, onSuccess }: any) {
        const nombre = partesNombre[0] || ''
        const apellidos = partesNombre.slice(1).join(' ') || ''
        
-       const firstLetter = nombre.charAt(0).toUpperCase()
-       const password = firstLetter + documento
+       const primerNombreLetra = nombre.charAt(0).toUpperCase() || ""
+       const primerApellidoLetra = apellidos ? apellidos.charAt(0).toUpperCase() : ""
+       const doc = documento
+       const seudoTelefono = doc.length >= 4 ? doc.slice(-4) : "1234"
+
+       const opcionesClave = [
+         `CC${doc}`,
+         `${primerNombreLetra}${doc}`,
+         `${seudoTelefono}${primerNombreLetra}${primerApellidoLetra}`,
+         `${doc}${primerNombreLetra}${primerApellidoLetra}`,
+         `${primerNombreLetra}${primerApellidoLetra}${doc}`
+       ]
+
+       const randomIndex = Math.floor(Math.random() * opcionesClave.length)
+       const password = opcionesClave[randomIndex]
 
        const rol = rolCol.toLowerCase().includes("admin") ? "admin" : "profesional"
 
@@ -468,8 +481,7 @@ function ImportUsersModal({ programas, onClose, onSuccess }: any) {
             <br/><br/>
             <span className="text-xs text-muted-foreground">
               <b>Notas:</b> <br/>
-              * La columna de contraseña siempre es ignorada. El sistema la genera sola 
-              (1ra letra del nombre en mayúscula + documento). <br/>
+              * La columna de contraseña siempre es ignorada. El sistema la genera sola de forma automática aleatoria (usando datos del usuario). <br/>
               * Debes colocar el nombre del programa tal cual como aparece en la lista de programas.
             </span>
           </p>

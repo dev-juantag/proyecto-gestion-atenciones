@@ -30,8 +30,22 @@ export async function POST(req: Request) {
       )
     }
 
-    // Generar contraseña temporal segura: CC + (documento del usuario)
-    const nuevaClave = `CC${unUsuario.documento}`
+    const primerNombreLetra = unUsuario.nombre.charAt(0).toUpperCase() || ""
+    const primerApellidoLetra = unUsuario.apellidos ? unUsuario.apellidos.charAt(0).toUpperCase() : ""
+    const doc = unUsuario.documento
+    // No existe "telefono" en el modelo User, así que se usa un fragmento del documento para la opción 3
+    const seudoTelefono = doc.length >= 4 ? doc.slice(-4) : "1234"
+
+    const opcionesClave = [
+      `CC${doc}`,                                                  // 1
+      `${primerNombreLetra}${doc}`,                                // 2
+      `${seudoTelefono}${primerNombreLetra}${primerApellidoLetra}`, // 3 (pseudo-teléfono)
+      `${doc}${primerNombreLetra}${primerApellidoLetra}`,          // 4
+      `${primerNombreLetra}${primerApellidoLetra}${doc}`           // 5
+    ]
+
+    const randomIndex = Math.floor(Math.random() * opcionesClave.length)
+    const nuevaClave = opcionesClave[randomIndex]
 
     // Encriptar la nueva
     const hashedTempPassword = await bcrypt.hash(nuevaClave, 10)
