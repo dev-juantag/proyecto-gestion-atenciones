@@ -25,7 +25,7 @@ import { useEffect } from "react"
 type SubView = "list" | "form" | "detail"
 
 export function AtencionesModule() {
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, isSuperAdmin } = useAuth()
   const [subView, setSubView] = useState<SubView>("list")
   const [selectedAtencion, setSelectedAtencion] = useState<Atencion | null>(null)
   const [search, setSearch] = useState("")
@@ -191,7 +191,7 @@ export function AtencionesModule() {
 
     const headers = [
       "Fecha", "Paciente Nombre", "Documento", "Tipo_Doc", "Genero", 
-      "Telefono", "Direccion", "Edad", "Fecha_Nacimiento", "Programa", 
+      ...(isSuperAdmin ? ["Telefono"] : []), "Direccion", "Edad", "Fecha_Nacimiento", "Programa", 
       "Profesional", "Nota_Valoracion"
     ]
     
@@ -206,7 +206,7 @@ export function AtencionesModule() {
       escapeCsv(a.pacienteDocumento),
       escapeCsv(a.pacienteTipoDoc),
       escapeCsv(a.pacienteGenero),
-      escapeCsv(a.pacienteTelefono),
+      ...(isSuperAdmin ? [escapeCsv(a.pacienteTelefono)] : []),
       escapeCsv(a.pacienteDireccion),
       calcularEdad(a.pacienteFechaNac)?.toString() || "",
       a.pacienteFechaNac || "",
