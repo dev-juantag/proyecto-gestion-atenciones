@@ -34,7 +34,14 @@ export function AdminReportes() {
   const [programas, setProgramas] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [currentStageStart, setCurrentStageStart] = useState<string | null>(null)
-  const [verHistorico, setVerHistorico] = useState(false)
+  
+  // Tipos de filtro: "etapa" = etapa actual, "fechas" = rango personalizado, "todo" = historico
+  const [filterMode, setFilterMode] = useState<"etapa" | "fechas" | "todo">("etapa")
+  const [dateRange, setDateRange] = useState({ 
+    start: new Date().toISOString().slice(0, 10), 
+    end: new Date().toISOString().slice(0, 10) 
+  })
+
   const [loading, setLoading] = useState(true)
   const [isRestarting, setIsRestarting] = useState(false)
   const [showRestartModal, setShowRestartModal] = useState(false)
@@ -88,15 +95,40 @@ export function AdminReportes() {
   }
 
   const filteredAtenciones = useMemo(() => {
-    if (verHistorico || !currentStageStart) return atenciones
-    return atenciones.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= new Date(currentStageStart))
-  }, [atenciones, currentStageStart, verHistorico])
+    if (filterMode === "todo") return atenciones
+    
+    if (filterMode === "etapa") {
+      if (!currentStageStart) return atenciones
+      return atenciones.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= new Date(currentStageStart))
+    }
+
+    if (filterMode === "fechas") {
+      const start = new Date(dateRange.start + "T00:00:00")
+      const end = new Date(dateRange.end + "T23:59:59")
+      return atenciones.filter(a => {
+        const d = new Date(a.createdAtISO || (a.fecha + "T00:00:00"))
+        return d >= start && d <= end
+      })
+    }
+
+    return atenciones
+  }, [atenciones, currentStageStart, filterMode, dateRange])
 
   const atencionesPerPrograma = useMemo(() => {
     return programas.map((p) => {
       const count = filteredAtenciones.filter((a) => a.programaId === p.id).length
-      const profCount = users.filter((u) => u.programaId === p.id && u.rol === "profesional").length
       
+      if (filterMode !== "etapa") {
+         return {
+           id: p.id,
+           nombre: p.nombre,
+           atenciones: count,
+           meta: "N/A",
+           porcentaje: "N/A"
+         }
+      }
+
+      const profCount = users.filter((u) => u.programaId === p.id && u.rol === "profesional").length
       const metaIndividual = p.meta !== null && p.meta !== undefined ? p.meta : CONFIG.META_INDIVIDUAL_POR_DEFECTO;
       const meta = profCount > 0 ? (profCount * metaIndividual) : metaIndividual;
       const porcentaje = meta > 0 ? Math.round((count / meta) * 100) : 0;
@@ -109,14 +141,25 @@ export function AdminReportes() {
         porcentaje: porcentaje,
       }
     }).sort((a, b) => a.nombre.localeCompare(b.nombre))
-  }, [filteredAtenciones, programas, users])
+  }, [filteredAtenciones, programas, users, filterMode])
 
   const atencionesPerProfesional = useMemo(() => {
     const profesionales = users.filter((u) => u.rol === "profesional")
     return profesionales.map((prof) => {
       const count = filteredAtenciones.filter((a) => a.profesionalId === prof.id).length
-      
       const programaDelProf = programas.find((p) => p.id === prof.programaId)
+
+      if (filterMode !== "etapa") {
+        return {
+          id: prof.id,
+          nombre: `${prof.nombre} ${prof.apellidos}`,
+          programa: programaDelProf?.nombre || "Sin programa",
+          atenciones: count,
+          meta: "N/A",
+          porcentaje: "N/A"
+        }
+      }
+      
       // La meta de un solo profesional equivale a la meta indiviudal del programa (o la global)
       const meta = programaDelProf?.meta !== null && programaDelProf?.meta !== undefined ? programaDelProf.meta : CONFIG.META_INDIVIDUAL_POR_DEFECTO;
       const porcentaje = meta > 0 ? Math.round((count / meta) * 100) : 0
@@ -130,7 +173,7 @@ export function AdminReportes() {
         porcentaje: porcentaje,
       }
     }).sort((a, b) => b.atenciones - a.atenciones) // Ordenamos por cantidad de atenciones de mayor a menor
-  }, [filteredAtenciones, users, programas])
+  }, [filteredAtenciones, users, programas, filterMode])
 
   const pieData = useMemo(() => {
     return atencionesPerPrograma
@@ -146,21 +189,42 @@ export function AdminReportes() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Reportes y Estadisticas</h1>
+          <h1 className="text-2xl font-bold text-foreground">Reportes y Estadísticas</h1>
           <p className="text-sm text-muted-foreground">
-            Analisis de atenciones por programa y cumplimiento de metas
+            Análisis de atenciones por programa y cumplimiento de metas
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-            <input
-              type="checkbox"
-              checked={verHistorico}
-              onChange={(e) => setVerHistorico(e.target.checked)}
-              className="rounded border-border text-primary focus:ring-primary h-4 w-4 transition-colors"
-            />
-            Ver todo el historial
-          </label>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <select 
+            className="rounded border border-border px-3 py-2 text-sm max-w-[200px]"
+            value={filterMode}
+            onChange={(e) => setFilterMode(e.target.value as "etapa" | "fechas" | "todo")}
+          >
+            <option value="etapa">Etapa Actual</option>
+            <option value="fechas">Por Período de Fechas</option>
+            <option value="todo">Todo el historial</option>
+          </select>
+
+          {filterMode === "fechas" && (
+            <div className="flex items-center gap-2">
+              <input 
+                type="date" 
+                className="rounded border border-border px-2 py-1.5 text-sm"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                max={dateRange.end}
+              />
+              <span className="text-muted-foreground">-</span>
+              <input 
+                type="date" 
+                className="rounded border border-border px-2 py-1.5 text-sm"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                min={dateRange.start}
+              />
+            </div>
+          )}
+
           <button
             onClick={() => setShowRestartModal(true)}
             className="flex items-center gap-2 rounded-lg bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer"
@@ -295,10 +359,14 @@ export function AdminReportes() {
                   {vistaTablet === "profesional" && (
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Programa</th>
                   )}
-                  <th className="px-4 py-3 text-center font-semibold text-foreground">Meta</th>
                   <th className="px-4 py-3 text-center font-semibold text-foreground">Registros</th>
-                  <th className="px-4 py-3 text-center font-semibold text-foreground">Cumplimiento</th>
-                  <th className="px-4 py-3 text-left font-semibold text-foreground">Progreso</th>
+                  {filterMode === "etapa" && (
+                    <>
+                      <th className="px-4 py-3 text-center font-semibold text-foreground">Meta</th>
+                      <th className="px-4 py-3 text-center font-semibold text-foreground">Cumplimiento</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Progreso</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -308,31 +376,35 @@ export function AdminReportes() {
                     {vistaTablet === "profesional" && (
                       <td className="px-4 py-3 text-muted-foreground">{(item as any).programa}</td>
                     )}
-                    <td className="px-4 py-3 text-center text-muted-foreground">{item.meta}</td>
                     <td className="px-4 py-3 text-center font-semibold text-foreground">{item.atenciones}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          item.porcentaje >= 100
-                            ? "bg-chart-3/15 text-chart-3"
-                            : item.porcentaje >= 50
-                            ? "bg-chart-4/15 text-chart-4"
-                            : "bg-destructive/10 text-destructive"
-                        }`}
-                      >
-                        {item.porcentaje}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="h-2 w-full max-w-[200px] rounded-full bg-muted">
-                        <div
-                          className={`h-2 rounded-full transition-all ${
-                            item.porcentaje >= 100 ? "bg-chart-3" : "bg-primary"
-                          }`}
-                          style={{ width: `${Math.min(100, item.porcentaje)}%` }}
-                        />
-                      </div>
-                    </td>
+                    {filterMode === "etapa" && (
+                      <>
+                        <td className="px-4 py-3 text-center text-muted-foreground">{item.meta}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              (item.porcentaje as number) >= 100
+                                ? "bg-chart-3/15 text-chart-3"
+                                : (item.porcentaje as number) >= 50
+                                ? "bg-chart-4/15 text-chart-4"
+                                : "bg-destructive/10 text-destructive"
+                            }`}
+                          >
+                            {item.porcentaje}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-2 w-full max-w-[200px] rounded-full bg-muted">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                (item.porcentaje as number) >= 100 ? "bg-chart-3" : "bg-primary"
+                              }`}
+                              style={{ width: `${Math.min(100, item.porcentaje as number)}%` }}
+                            />
+                          </div>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
                 
