@@ -278,7 +278,7 @@ export function AtencionesModule() {
             <Download className="h-4 w-4" />
             Descargar Excel
           </button>
-          {!isAdmin && (
+          {(!isAdmin || isSuperAdmin) && (
             <button
               onClick={() => setSubView("form")}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
@@ -418,6 +418,16 @@ export function AtencionesModule() {
                           >
                             <Eye className="h-4 w-4" />
                           </button>
+                          {isSuperAdmin && (
+                            <button
+                              onClick={() => handleDelete(a.id)}
+                              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-muted"
+                              title="Eliminar atención"
+                              aria-label="Eliminar atención"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
