@@ -1034,7 +1034,10 @@ function AtencionDetail({
         <div>
           <h1 className="text-2xl font-bold text-foreground">Detalle de Atención</h1>
           <p className="text-sm text-muted-foreground">
-            Registrado el {atencion.fecha}
+            {atencion.createdAtISO 
+              ? `Registrado el ${atencion.fecha} a las ${new Date(atencion.createdAtISO).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true })}`
+              : `Registrado el ${atencion.fecha}`
+            }
           </p>
         </div>
       </div>
