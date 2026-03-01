@@ -45,9 +45,15 @@ export function AdminUsuarios() {
   }
 
   async function fetchProgramas() {
-    const res = await fetch("/api/programas")
-    const data = await res.json()
-    setProgramas(data)
+    try {
+      const res = await fetch("/api/programas")
+      if (res.ok) {
+        const data = await res.json()
+        setProgramas(data)
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   const filtered = useMemo(() => {
