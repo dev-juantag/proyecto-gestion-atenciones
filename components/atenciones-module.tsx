@@ -485,7 +485,7 @@ export function AtencionesModule() {
 
       {/* Security Alert Modal for Export */}
       {showExportAlert && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/50 p-4 pt-20">
           <div className="w-full max-w-md rounded-xl border border-destructive bg-card p-6 shadow-lg">
             <div className="mb-4 flex items-center gap-3 text-destructive">
               <AlertTriangle className="h-6 w-6" />

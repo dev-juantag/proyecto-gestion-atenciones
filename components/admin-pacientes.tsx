@@ -10,7 +10,6 @@ import {
   Trash2,
   X,
   Users,
-  AlertTriangle,
 } from "lucide-react"
 
 export function AdminPacientes() {
@@ -23,8 +22,6 @@ export function AdminPacientes() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Paciente>>({})
   const [errorEdit, setErrorEdit] = useState("")
-
-  const [showExportAlert, setShowExportAlert] = useState(false)
 
   const fetchPacientes = async () => {
     setLoading(true)
@@ -196,7 +193,7 @@ export function AdminPacientes() {
         </div>
         
         <button
-          onClick={() => setShowExportAlert(true)}
+          onClick={handleExport}
           className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 hover:bg-muted font-medium text-sm transition-colors"
         >
           <Download className="h-4 w-4" /> Exportar a Excel
@@ -378,41 +375,6 @@ export function AdminPacientes() {
                   Guardar Cambios
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Security Alert Modal for Export */}
-      {showExportAlert && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-destructive bg-card p-6 shadow-lg">
-            <div className="mb-4 flex items-center gap-3 text-destructive">
-              <AlertTriangle className="h-6 w-6" />
-              <h2 className="text-xl font-bold">Advertencia de Seguridad</h2>
-            </div>
-            
-            <p className="text-foreground text-sm mb-4">
-              Está a punto de exportar datos sensibles de salud. ¿Desea continuar?
-            </p>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowExportAlert(false)}
-                className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => {
-                  setShowExportAlert(false)
-                  handleExport()
-                }}
-                className="flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer"
-              >
-                <Download className="h-4 w-4" />
-                Sí, Exportar y Descargar
-              </button>
             </div>
           </div>
         </div>
