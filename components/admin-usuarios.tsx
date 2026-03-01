@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
-import { Plus, Search, Pencil, Trash2, X, Upload } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, X, Upload, Power } from "lucide-react"
 
 type Role = "superadmin" | "admin" | "profesional"
 
@@ -113,6 +113,24 @@ export function AdminUsuarios() {
       return
     }
 
+    fetchUsers()
+  }
+
+  const handleToggleStatus = async (u: User) => {
+    if (u.rol === "superadmin") return;
+    const accion = u.activo === false ? "habilitar" : "deshabilitar";
+    if (!confirm(`¿Seguro que quieres ${accion} a este usuario?`)) return;
+
+    const res = await fetch(`/api/users/${u.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activo: u.activo === false ? true : false }),
+    });
+
+    if (!res.ok) {
+      alert("Error al cambiar el estado del usuario");
+      return;
+    }
     fetchUsers()
   }
 
@@ -275,9 +293,14 @@ export function AdminUsuarios() {
                           SuperAdmin puede eliminar Admins y Profesionales.
                       */}
                       {u.rol !== "superadmin" && (user?.rol === "superadmin" || (user?.rol === "admin" && u.rol === "profesional")) && (
-                        <button onClick={() => handleDelete(u)} title="Eliminar Usuario">
-                          <Trash2 className="h-4 w-4 inline ml-2 text-red-500" />
-                        </button>
+                        <>
+                          <button onClick={() => handleToggleStatus(u)} title={u.activo === false ? "Habilitar Usuario" : "Deshabilitar Usuario"}>
+                            <Power className={`h-4 w-4 inline ml-2 ${u.activo === false ? "text-muted-foreground" : "text-green-500"}`} />
+                          </button>
+                          <button onClick={() => handleDelete(u)} title="Eliminar Usuario">
+                            <Trash2 className="h-4 w-4 inline ml-2 text-red-500" />
+                          </button>
+                        </>
                       )}
                     </td>
                   </tr>

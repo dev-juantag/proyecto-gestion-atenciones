@@ -22,16 +22,23 @@ export async function PUT(
       password,
       rol,
       programaId,
+      activo,
     } = body
 
-    const dataToUpdate: any = {
-      nombre,
-      apellidos,
-      documento,
-      email,
-      rol: rol.toUpperCase(),
-      programaId: rol === "admin" || !programaId ? null : programaId,
+    const dataToUpdate: any = {}
+    
+    if (nombre !== undefined) dataToUpdate.nombre = nombre
+    if (apellidos !== undefined) dataToUpdate.apellidos = apellidos
+    if (documento !== undefined) dataToUpdate.documento = documento
+    if (email !== undefined) dataToUpdate.email = email
+    if (rol !== undefined) {
+      dataToUpdate.rol = rol.toUpperCase()
+      dataToUpdate.programaId = rol === "admin" || !programaId ? null : programaId
+    } else if (programaId !== undefined) {
+      dataToUpdate.programaId = programaId
     }
+    
+    if (activo !== undefined) dataToUpdate.activo = activo
 
     if (password) {
       dataToUpdate.password = await bcrypt.hash(password, 10)
