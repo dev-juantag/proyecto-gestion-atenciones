@@ -14,6 +14,7 @@ interface User {
   email: string
   rol: Role
   programaId?: string | null
+  activo?: boolean
 }
 
 interface Programa {
@@ -153,8 +154,16 @@ export function AdminUsuarios() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground flex items-center gap-2">
             Administre los usuarios del sistema
+            <span className="text-muted-foreground/50 text-xs">|</span>
+            <span className="text-xs text-primary/80 font-medium">
+              {users.filter(u => u.rol === "profesional" && u.activo !== false).length} activos
+            </span>
+            <span className="text-muted-foreground/50 text-xs">-</span>
+            <span className="text-xs text-destructive/80 font-medium">
+              {users.filter(u => u.rol === "profesional" && u.activo === false).length} inactivos
+            </span>
           </p>
         </div>
 
