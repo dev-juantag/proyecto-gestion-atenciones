@@ -204,7 +204,7 @@ export function AtencionesModule() {
     };
 
     const headers = [
-      "Fecha", "Paciente Nombre", "Documento", "Tipo_Doc", "Genero", 
+      "Fecha", "Hora Exacta", "Paciente Nombre", "Documento", "Tipo_Doc", "Genero", 
       ...(isSuperAdmin ? ["Telefono"] : []), "Direccion", "Edad", "Fecha_Nacimiento", "Programa", 
       "Profesional", "Nota_Valoracion"
     ]
@@ -216,6 +216,7 @@ export function AtencionesModule() {
 
     const rows = toExport.map(a => [
       a.fecha,
+      escapeCsv(a.createdAtISO ? new Date(a.createdAtISO).toLocaleString('es-CO') : ""),
       escapeCsv(a.pacienteNombre),
       escapeCsv(a.pacienteDocumento),
       escapeCsv(a.pacienteTipoDoc),

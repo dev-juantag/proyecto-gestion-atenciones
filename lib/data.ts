@@ -44,6 +44,7 @@ export interface Atencion {
   profesionalId: string
   profesionalNombre: string
   fecha: string
+  createdAtISO?: string
 }
 
 export const PROGRAMAS: Programa[] = [
