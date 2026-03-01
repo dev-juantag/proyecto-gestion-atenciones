@@ -237,7 +237,7 @@ const handleRecoverySubmit = async (e: React.FormEvent) => {
           )}
         </div>
         <p className="mt-6 text-center text-sm font-medium text-muted-foreground/60">
-          Creado por Juan Taguado con Antigravity
+          © 2026 Juan Taguado – Todos los derechos reservados
         </p>
       </div>
     </div>

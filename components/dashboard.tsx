@@ -166,7 +166,7 @@ export function Dashboard() {
         {/* Brand / Credits */}
         <div className="px-4 pb-3">
           <p className="text-[11px] text-center text-sidebar-foreground/30 font-medium">
-            Creado por Juan Taguado con Antigravity
+            © 2026 Juan Taguado – Todos los derechos reservados
           </p>
         </div>
 
