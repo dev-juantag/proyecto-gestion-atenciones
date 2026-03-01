@@ -25,6 +25,31 @@ export function DashboardHome() {
   const { user, isAdmin } = useAuth()
   const today = new Date().toISOString().slice(0, 10)
 
+  // Helper para tiempo relativo
+  const getRelativeTime = (isoString?: string, defaultDateStr?: string) => {
+    if (!isoString && !defaultDateStr) return "hace poco";
+    
+    // Si no hay timestamp ISO, usamos la fecha default pero es menos preciso
+    const date = isoString ? new Date(isoString) : new Date(defaultDateStr + "T00:00:00");
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "hace unos segundos";
+    if (diffMins < 60) return `hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "hace 1 día";
+    if (diffDays < 30) return `hace ${diffDays} días`;
+    
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths === 1) return "hace 1 mes";
+    return `hace ${diffMonths} meses`;
+  };
+
   // ==========================================
   // CONFIGURACIÓN: CAMBIA ESTE NÚMERO PARA MOSTRAR MÁS O MENOS PROFESIONALES EN EL TOP
   // ==========================================
@@ -33,6 +58,7 @@ export function DashboardHome() {
   const [atenciones, setAtenciones] = useState<any[]>([])
   const [usuarios, setUsuarios] = useState<any[]>([])
   const [programas, setProgramas] = useState<any[]>([])
+  const [currentStageStart, setCurrentStageStart] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true)
 
@@ -42,15 +68,20 @@ export function DashboardHome() {
       
       try {
         setLoading(true)
-        const [resAt, resUs, resPr] = await Promise.all([
+        const [resAt, resUs, resPr, resStage] = await Promise.all([
           fetch("/api/atenciones"),
           fetch("/api/users"),
-          fetch("/api/programas")
+          fetch("/api/programas"),
+          fetch("/api/settings/stage")
         ])
 
         if (resAt.ok) setAtenciones(await resAt.json())
         if (resUs.ok) setUsuarios(await resUs.json())
         if (resPr.ok) setProgramas(await resPr.json())
+        if (resStage.ok) {
+          const data = await resStage.json()
+          setCurrentStageStart(data.currentStageStart)
+        }
       } catch (e) {
         console.error(e)
       } finally {
@@ -60,14 +91,20 @@ export function DashboardHome() {
     fetchData()
   }, [user])
 
-  // Todas las atenciones generales de la base de datos de hoy
-  const todayAtenciones = useMemo(() => atenciones.filter(a => a.fecha.startsWith(today)), [atenciones, today])
+  // Todas las atenciones filtradas por la etapa actual (si existe)
+  const filteredAtenciones = useMemo(() => {
+    if (!currentStageStart) return atenciones;
+    return atenciones.filter(a => new Date(a.createdAtISO || (a.fecha + "T00:00:00")) >= new Date(currentStageStart));
+  }, [atenciones, currentStageStart]);
+
+  // Todas las atenciones de hoy (basadas en las filtradas por etapa)
+  const todayAtenciones = useMemo(() => filteredAtenciones.filter(a => a.fecha.startsWith(today)), [filteredAtenciones, today])
   
-  // Atenciones especificas del profesional que inició sesión
-  const misAtenciones = useMemo(() => atenciones.filter(a => a.profesionalId === user?.id), [atenciones, user])
+  // Atenciones especificas del profesional que inició sesión (basadas en etapa)
+  const misAtenciones = useMemo(() => filteredAtenciones.filter(a => a.profesionalId === user?.id), [filteredAtenciones, user])
   
   const profesionalesActivos = useMemo(
-    () => usuarios.filter((u) => u.rol === "profesional").length,
+    () => usuarios.filter((u) => u.rol === "profesional" && u.activo !== false).length,
     [usuarios]
   )
 
@@ -77,21 +114,21 @@ export function DashboardHome() {
   const chartData = useMemo(() => {
     return programas.map((p) => ({
       nombre: p.nombre.length > 12 ? p.nombre.slice(0, 12) + "..." : p.nombre,
-      atenciones: atenciones.filter((a) => a.programaId === p.id).length,
+      atenciones: filteredAtenciones.filter((a) => a.programaId === p.id).length,
     })).filter((d) => d.atenciones > 0)
-  }, [programas, atenciones])
+  }, [programas, filteredAtenciones])
 
   // Atenciones recientes
   const recentAtenciones = useMemo(() => {
     if (isAdmin) {
-      return [...atenciones].slice(0, 5)
+      return [...filteredAtenciones].slice(0, 5)
     } else {
       // Mostrar atenciones de TODOS los profesionales del MISMO programa
-      return atenciones.filter(
+      return filteredAtenciones.filter(
         a => a.programaId === user?.programaId
       ).slice(0, 5)
     }
-  }, [atenciones, isAdmin, user])
+  }, [filteredAtenciones, isAdmin, user])
 
   // Top Profesionales
   const top10Profesionales = useMemo(() => {
@@ -99,7 +136,7 @@ export function DashboardHome() {
     const profs = usuarios.filter((u) => u.rol === "profesional");
     
     const counts = profs.map(p => {
-      const atencionesProf = atenciones.filter(a => a.profesionalId === p.id);
+      const atencionesProf = filteredAtenciones.filter(a => a.profesionalId === p.id);
       const atencCount = atencionesProf.length;
       
       // Determina la marca de tiempo de su última atención para desempatar
@@ -133,13 +170,13 @@ export function DashboardHome() {
     });
 
     return counts.slice(0, TOP_N_PROFESIONALES);
-  }, [usuarios, atenciones, user, programas]);
+  }, [usuarios, filteredAtenciones, user, programas]);
 
   const kpis = isAdmin
     ? [
         {
           label: "Total atenciones",
-          value: atenciones.length,
+          value: filteredAtenciones.length,
           icon: <ClipboardList className="h-5 w-5" />,
           color: "bg-primary/10 text-primary",
         },
@@ -150,7 +187,7 @@ export function DashboardHome() {
           color: "bg-chart-3/10 text-chart-3",
         },
         {
-          label: "Profesionales",
+          label: "Profesionales activos",
           value: profesionalesActivos,
           icon: <Users className="h-5 w-5" />,
           color: "bg-chart-2/10 text-chart-2",
@@ -298,11 +335,16 @@ export function DashboardHome() {
                       {a.pacienteNombre}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {getProgramaById(a.programaId)?.nombre} — {a.fecha}
+                      {isAdmin 
+                        ? `${getProgramaById(a.programaId)?.nombre} — ${getRelativeTime(a.createdAtISO, a.fecha)}`
+                        : `Por: ${a.profesionalNombre} - ${getRelativeTime(a.createdAtISO, a.fecha)}`
+                      }
                     </p>
-                    <p className="text-[11px] text-muted-foreground/80 mt-0.5">
-                      Por: <span className="font-medium text-foreground/80">{a.profesionalNombre}</span>
-                    </p>
+                    {isAdmin && (
+                      <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                        Por: <span className="font-medium text-foreground/80">{a.profesionalNombre}</span>
+                      </p>
+                    )}
                   </div>
                 </li>
               ))}
