@@ -8,7 +8,7 @@ import { sendRecoveryEmail } from "@/lib/mailer"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { email } = body
+    const { email, isAdminRequest } = body
 
     if (!email) {
       return NextResponse.json(
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       SMTP_PASS=tu-contraseña-de-aplicacion
     */
     // Enviar el email real
-    const sent = await sendRecoveryEmail(email, nuevaClave, primerNombre)
+    const sent = await sendRecoveryEmail(email, nuevaClave, primerNombre, isAdminRequest)
 
     if (!sent) {
       const msjLocalDemo = process.env.SMTP_USER 

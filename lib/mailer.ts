@@ -20,7 +20,7 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendRecoveryEmail = async (to: string, tempPassword: string, primerNombre: string) => {
+export const sendRecoveryEmail = async (to: string, tempPassword: string, primerNombre: string, isAdminRequest: boolean = false) => {
   if (!SMTP_USER || !SMTP_PASS) {
     console.warn("⚠️ Nodemailer no está configurado. La contraseña generada es:", tempPassword);
     // Solo simularemos el envío si las credenciales no están enviadas, útil para pruebas locales
@@ -39,7 +39,13 @@ export const sendRecoveryEmail = async (to: string, tempPassword: string, primer
           </div>
           <div style="padding: 30px; background-color: #ffffff;">
             <p style="font-size: 16px; color: #334155;">Hola, ${primerNombre}</p>
-            <p style="font-size: 16px; color: #334155;">Has solicitado recuperar tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>.</p>
+            <p style="font-size: 16px; color: #334155;">
+              ${
+                isAdminRequest 
+                  ? "Un administrador ha solicitado restablecer tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>." 
+                  : "Has solicitado recuperar tu contraseña para acceder al <strong>Sistema de Gestión de Atenciones</strong>."
+              }
+            </p>
             
             <div style="background-color: #f8fafc; border-left: 4px solid #2F1160; padding: 15px; margin: 25px 0;">
               <p style="margin: 0; font-size: 14px; color: #64748b;">Tu contraseña es:</p>

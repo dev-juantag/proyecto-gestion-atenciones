@@ -515,7 +515,7 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
       const res = await fetch("/api/auth/recuperar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, isAdminRequest: true }),
       });
       const data = await res.json();
       if (!res.ok) {
