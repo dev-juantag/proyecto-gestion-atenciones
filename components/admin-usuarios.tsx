@@ -75,6 +75,14 @@ export function AdminUsuarios() {
       if (rolWeight[a.rol] !== rolWeight[b.rol]) {
         return rolWeight[a.rol] - rolWeight[b.rol]
       }
+
+      // Dentro del mismo rol (ej. profesionales), primero los activos, luego los inactivos
+      const aActivo = a.activo !== false ? 1 : 0
+      const bActivo = b.activo !== false ? 1 : 0
+      if (aActivo !== bActivo) {
+        return bActivo - aActivo // El 1 (activo) va antes que el 0 (inactivo)
+      }
+
       const nombreA = `${a.nombre} ${a.apellidos}`.toLowerCase()
       const nombreB = `${b.nombre} ${b.apellidos}`.toLowerCase()
       return nombreA.localeCompare(nombreB)
@@ -260,7 +268,7 @@ export function AdminUsuarios() {
                 const programa = programas.find((p) => p.id === u.programaId)
 
                 return (
-                  <tr key={u.id} className="border-b last:border-0">
+                  <tr key={u.id} className={`border-b last:border-0 transition-colors ${u.activo === false ? "bg-muted/40 opacity-70" : ""}`}>
                     <td className="px-4 py-3">
                       {u.nombre} {u.apellidos}
                     </td>
