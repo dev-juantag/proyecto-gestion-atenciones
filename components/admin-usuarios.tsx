@@ -506,6 +506,30 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
   const [rol, setRol] = useState<Role>(user?.rol || defaultRol)
   const [programaId, setProgramaId] = useState(user?.programaId || "")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [sendingRecovery, setSendingRecovery] = useState(false)
+
+  const handleSendRecovery = async () => {
+    if (!email) return;
+    setSendingRecovery(true);
+    try {
+      const res = await fetch("/api/auth/recuperar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Ocurrió un error al enviar el correo.");
+      } else {
+        alert(data.message || "Correo de recuperación enviado.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexión al enviar el correo.");
+    } finally {
+      setSendingRecovery(false);
+    }
+  }
 
   const isAdminSelfEdit = currentUser?.rol === "admin" && user?.id === currentUser?.id;
 
@@ -601,6 +625,19 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
               required={!user}
               className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
             />
+            {user && (
+              <div className="flex justify-end mt-1">
+                <button
+                  type="button"
+                  onClick={handleSendRecovery}
+                  disabled={sendingRecovery}
+                  className="text-xs font-medium text-primary hover:underline transition-colors disabled:opacity-50"
+                  title="Envia un correo electrónico con una contraseña original autogenerada."
+                >
+                  {sendingRecovery ? "Enviando..." : "¿Restablecer y enviar al correo?"}
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
