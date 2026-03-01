@@ -614,31 +614,32 @@ function UserFormModal({ user, programas, onClose, onSave }: any) {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-foreground">
-              {user ? "Nueva Contraseña (Opcional)" : "Contraseña"}
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required={!user}
-              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
-            />
-            {user && (
-              <div className="flex justify-end mt-1">
-                <button
-                  type="button"
-                  onClick={handleSendRecovery}
-                  disabled={sendingRecovery}
-                  className="text-xs font-medium text-primary hover:underline transition-colors disabled:opacity-50"
-                  title="Envia un correo electrónico con una contraseña original autogenerada."
-                >
-                  {sendingRecovery ? "Enviando..." : "¿Restablecer y enviar al correo?"}
-                </button>
-              </div>
-            )}
-          </div>
+          {user ? (
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={handleSendRecovery}
+                disabled={sendingRecovery}
+                className="text-sm font-medium text-primary hover:underline transition-colors disabled:opacity-50"
+                title="Envia un correo electrónico con una contraseña original autogenerada."
+              >
+                {sendingRecovery ? "Enviando correo..." : "Enviar restablecimiento de contraseña al correo"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-semibold text-foreground">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+              />
+            </div>
+          )}
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-foreground">Rol</label>
