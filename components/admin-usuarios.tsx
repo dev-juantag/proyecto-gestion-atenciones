@@ -391,7 +391,12 @@ function ImportUsersModal({ programas, onClose, onSuccess }: any) {
        const rolCol = cols[4] || ""
        const programaCol = cols[5] || ""
 
-       const partesNombre = nombreCompleto.split(' ')
+       let partesNombre = nombreCompleto.trim().split(/\s+/)
+       
+       if (partesNombre.length === 4) {
+         partesNombre = [partesNombre[0], partesNombre[2], partesNombre[3]]
+       }
+
        const nombre = partesNombre[0] || ''
        const apellidos = partesNombre.slice(1).join(' ') || ''
        
@@ -463,7 +468,6 @@ function ImportUsersModal({ programas, onClose, onSuccess }: any) {
             <br/><br/>
             <span className="text-xs text-muted-foreground">
               <b>Notas:</b> <br/>
-              * Lo ideal es que sea solo el primer nombre con los apellidos. <br/>
               * La columna de contraseña siempre es ignorada. El sistema la genera sola 
               (1ra letra del nombre en mayúscula + documento). <br/>
               * Debes colocar el nombre del programa tal cual como aparece en la lista de programas.
