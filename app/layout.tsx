@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   // CAMBIAR ICONO DE LA PESTAÑA DEL NAVEGADOR AQUÍ (Favicon):
   // Asegúrate de tener la imagen dentro de la carpeta "public" y enlazarla aquí.
   icons: {
-    icon: '/icono-ese-salud-pereira.png',
-    apple: '/icono-ese-salud-pereira.png', // Para dispositivos móviles de Apple
+    icon: '/icon-tech-tag.png',
+    apple: '/icon-tech-tag.png', // Para dispositivos móviles de Apple
   },
   
   openGraph: {
